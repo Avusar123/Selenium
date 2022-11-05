@@ -24,6 +24,8 @@ namespace Selenium.Modules
 
         public event AsyncEventHandler<CrashGame> CrashCreated;
 
+        public event AsyncEventHandler<string> GameStateChaged;
+
         private IAccountGenerationModule accountmodule;
 
         private ILogger<SocketModule> logger;
@@ -53,6 +55,7 @@ namespace Selenium.Modules
             WebSocket.OnConnected += OnConnected;
             await WebSocket.ConnectAsync();
             AddHandlingEvent("crash.onCreated", CrashCreated);
+            AddHandlingEvent("crash.state", GameStateChaged);
         }
 
         private void OnConnected(object? sender, EventArgs e)
@@ -81,7 +84,7 @@ namespace Selenium.Modules
 
     public interface ISocketModule
     {
-
+        public event AsyncEventHandler<string> GameStateChaged;
         public Task Connect();
 
         public event AsyncEventHandler<CrashGame> CrashCreated;

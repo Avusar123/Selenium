@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Security.Principal;
+
 namespace Selenium.Modules
 {
     public class BetBot : BackgroundService
@@ -39,21 +41,34 @@ namespace Selenium.Modules
         private async Task InitSocket()
         {
             apiSocket.CrashCreated += UpdateGame;
+            apiSocket.GameStateChaged += GameStateChaged;
             await apiSocket.Connect();
+        }
+
+        private async Task GameStateChaged(object? sender, string e)
+        {
+            if (e == "complete")
+            {
+                accountList.RemoveAll((userData) => userData.Balance < 1);
+
+                logger.LogDebug($"Accounts were deleted");
+            }
         }
 
         private async Task PlaceBetForAllAccounts(int roundId)
         {
+            Console.WriteLine(accountList.Count);
+
             foreach (var account in accountList)
             {
                 var balance = await api.GetBalance(new BalanceRequest() { Token = account.Token });
 
+                account.Balance = balance.Balance;
+
                 logger.LogDebug($"Account {account.Login} has balance {balance.Balance}");
 
                 if (balance.Balance < 1)
-                {
-                    accountList.Remove(account);
-                    logger.LogDebug($"Account {account.Login} was deleted");
+                {   
                     continue;
                 }
 
@@ -71,7 +86,7 @@ namespace Selenium.Modules
                     betamount = balance.Balance;
                 } else
                 {
-                    betamount = (float)Math.Round((double)(balance.Balance / betAmountMultiplier), 0);
+                    betamount = (float)Math.Round((double)(balance.Balance / betAmountMultiplier), 0, MidpointRounding.ToPositiveInfinity);
                 }
 
                 await api.PlaceBet(new() { AutoStopRatio = 2, BetAmount = betamount, RoundId = roundId, Token = account.Token });
@@ -84,7 +99,9 @@ namespace Selenium.Modules
         {
             while (true)
             {
-                accountList.Add(await accountGenerationModule.GeneratePlayableAccount());
+                var account = await accountGenerationModule.GeneratePlayableAccount();
+                account.Balance = 1;
+                accountList.Add(account);
             }
 
             logger.LogDebug("Updated List Of Accounts");

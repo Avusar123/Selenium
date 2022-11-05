@@ -8,11 +8,14 @@
 
         public string Token { get; set; }
 
+        public float Balance { get; set; }
+
         public UserData(string login, string password, string token)
         {
             Login = login;
             Password = password;
             Token = token;
+            Balance = 0;
         }
     }
 }
