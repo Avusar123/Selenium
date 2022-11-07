@@ -9,11 +9,43 @@ using System.Security.Cryptography;
 
 namespace Selenium
 {
-    public class OneClickRegistrationRequest : RequestParamsBase
+    public class EmailRegistrationRequest : RequestParamsBase
     {
-        public override string Link => "https://api.getx.pro/auth/register/one_click";
+        public override string Link => "https://api.getx.pro/auth/register/email";
 
         public override HttpMethod Method => HttpMethod.Post;
+
+        public string Email { get; set; }
+
+        public string Password { get; set; }
+
+        public override string GetBody()
+        {
+            var serializerSettings = new JsonSerializerSettings();
+
+            serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
+            var obj = new { email = Email, password = Password};
+
+            return JsonConvert.SerializeObject(obj, serializerSettings);
+        }
+    }
+
+    public class RandomEmailRequest : RequestParamsBase
+    {
+        public override string Link => "https://generatefakename.com/ru/email";
+
+        public override HttpMethod Method => HttpMethod.Get;
+    }
+
+
+    public class LoginRequest : RequestParamsBase
+    {
+        public override string Link => "https://api.getx.pro/profile/user";
+
+        public override HttpMethod Method => HttpMethod.Get;
+
+        public string Token { get; set; }
     }
 
     public class BalanceRequest : RequestParamsBase
@@ -88,5 +120,19 @@ namespace Selenium
         {
             return String.Empty;
         }
+    }
+
+    public abstract class ParseRequest : RequestParamsBase
+    {
+        public abstract string XPathSelector { get; }
+    }
+
+    public class RandomEmailParseRequest : ParseRequest
+    {
+        public override string Link => "https://randomus.ru/name?type=101&sex=10&count=1";
+
+        public override HttpMethod Method => HttpMethod.Get;
+
+        public override string XPathSelector => "//*[@id=\"result_tiles\"]/div/div/div/span";
     }
 }

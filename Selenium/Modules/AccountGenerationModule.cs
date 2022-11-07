@@ -1,86 +1,50 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OpenQA.Selenium.DevTools.V104.BackgroundService;
+using Selenium.Database;
+using Selenium.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Selenium.Modules
 {
-    public class AccountGenerationModule : BackgroundService, IAccountGenerationModule
+    public class AccountGenerationModule : IAccountGenerationModule
     {
-        private ILogger<AccountGenerationModule> logger;
-
         private IAPI api;
 
-        private async Task<UserData> GenerateAccount()
-        {
-            var responce = await api.OneClickRegistration(new OneClickRegistrationRequest());
+        const int NeededCash = 15;
 
-            var userdata = new UserData(responce.Login, responce.Password, responce.Token);
+        public async Task<UserData> GenerateAccount(float autostop, int betmultiplier)
+        {
+            var password = Guid.NewGuid().ToString("N").ToLower().Substring(0, 10);
+
+            var email = await api.GetRandomMail(new RandomEmailRequest());
+
+            if (email.Email.Length > 30)
+            {
+                throw new TooLongEmailException(email.Email);
+            }
+            
+            var emailresponce = await api.EmailRegistration(new EmailRegistrationRequest() { Email = email.Email, Password = password });
+
+            var userdata = new UserData() { Login = email.Email, Password = password, 
+                Token = emailresponce.Token, BetMultiplier = betmultiplier, NeededCash = NeededCash, AutoStopRatio = autostop, Balance = 0 };
 
             return userdata;
         }
 
-        private async Task<float> GetBonus(UserData user)
+        public AccountGenerationModule(IAPI api)
         {
-            var responce = await api.StartFreeSpin(new SpinRequest() { Token = user.Token });
-
-            return responce.Bonus;
-        }
-
-        public async Task<UserData> GeneratePlayableAccount()
-        {
-            while (true)
-            {
-                var user = await GenerateAccount();
-                var bonus = await GetBonus(user);
-                if (bonus == 1)
-                {
-                    logger.LogDebug($"New playable account generated with Login: {user.Login} and Password: {user.Password}");
-                    return user;
-                }
-            }
-        }
-
-        public async Task<List<UserData>> GeneratePlayableAccount(int count)
-        {
-            var result = new List<UserData>();
-
-            for (int i = 0; i < count; i++)
-            {
-                result.Add(await GeneratePlayableAccount());
-            }
-
-            return result;
-        }
-
-        public async Task<string> GetOneTimeToken()
-        {
-            var account = await GenerateAccount();
-            return account.Token;
-        }
-
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public AccountGenerationModule(IAPI api, ILogger<AccountGenerationModule> logger)
-        {
-            this.logger = logger;
             this.api = api;
         }
     }
 
     public interface IAccountGenerationModule
     {
-        public Task<List<UserData>> GeneratePlayableAccount(int count);
 
-        public Task<UserData> GeneratePlayableAccount();
-
-        public Task<string> GetOneTimeToken();
+        public Task<UserData> GenerateAccount(float autostop, int betmultiplier);
     }
 }

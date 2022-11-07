@@ -2,6 +2,9 @@
 {
     public class UserData
     {
+
+        public int Id { get; set; }
+
         public string Login { get; set; }
 
         public string Password { get; set; }
@@ -10,12 +13,12 @@
 
         public float Balance { get; set; }
 
-        public UserData(string login, string password, string token)
-        {
-            Login = login;
-            Password = password;
-            Token = token;
-            Balance = 0;
-        }
+        public int NeededCash { get; set; }
+
+        public int BetMultiplier { get; set; }
+
+        public float AutoStopRatio { get; set; }
+
+        public DateTime LastSpin { get; set; }
     }
 }

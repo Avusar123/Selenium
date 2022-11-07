@@ -1,19 +1,7 @@
-﻿using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using HtmlAgilityPack;
 using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
-using OpenQA.Selenium.Support.UI;
-using SeleniumExtras.WaitHelpers;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using Newtonsoft.Json;
-using System.Runtime.Serialization;
-using Newtonsoft.Json.Serialization;
-using OpenQA.Selenium.DevTools.V104.Page;
 
 namespace Selenium
 {
@@ -31,9 +19,11 @@ namespace Selenium
             return await SendRequest<CrashHistoryResponce>(request);
         }
 
-        public async Task<OneClickRegistrationResponce> OneClickRegistration(OneClickRegistrationRequest request)
+        public async Task<EmailRegistrationOriginal> EmailRegistration(EmailRegistrationRequest request)
         {
-            return await SendRequest<OneClickRegistrationResponce>(request);
+            var responce = await SendRequest<EmailRegistationResponce>(request);
+
+            return responce.Original;
         }
 
         public async Task<SpinResponce> StartFreeSpin(SpinRequest request)
@@ -91,13 +81,48 @@ namespace Selenium
 
             return requestMessage;
         }
+
+        private async Task<HtmlNodeCollection> ParseHtml(ParseRequest request)
+        {
+            var responce = await client.GetAsync(request.Link);
+
+            HtmlDocument htmlDoc = new HtmlDocument();
+
+            htmlDoc.LoadHtml(await responce.Content.ReadAsStringAsync());
+
+            var elementcollection = htmlDoc.DocumentNode.SelectNodes(request.XPathSelector);
+
+            return elementcollection;
+        }
+
+        public async Task<LoginResponce> Login(LoginRequest request)
+        {
+            var auth = new AuthenticationHeaderValue("Bearer", request.Token);
+
+            return await SendRequest<LoginResponce>(request, auth);
+        }
+
+        public async Task<RandomEmailResponce> GetRandomMail(RandomEmailRequest request)
+        {
+            var random = new Random();
+
+            var nodecollection = await ParseHtml(new RandomEmailParseRequest());
+
+            var nickname = nodecollection[0].FirstChild.InnerHtml;
+
+            var email = nickname.ToLower().Replace(" ", "") + random.Next(DateTime.Now.Year - 70, DateTime.Now.Year - 18) + "@gmail.com";
+
+            return new RandomEmailResponce() { Email = email};
+        }
     }
 
 
 
     public interface IAPI
     {
-        public Task<OneClickRegistrationResponce> OneClickRegistration(OneClickRegistrationRequest request);
+        public Task<EmailRegistrationOriginal> EmailRegistration(EmailRegistrationRequest request);
+
+        public Task<RandomEmailResponce> GetRandomMail(RandomEmailRequest request);
 
         public Task<SpinResponce> StartFreeSpin(SpinRequest request);
 
@@ -106,6 +131,8 @@ namespace Selenium
         public Task<CrashHistoryResponce> GetCrashHistory(CrashHistoryRequest request);
 
         public Task<PlaceBetResponce> PlaceBet(PlaceBetRequest request);
+
+        public Task<LoginResponce> Login(LoginRequest request);
     }
 
     

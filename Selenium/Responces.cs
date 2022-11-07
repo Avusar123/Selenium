@@ -6,15 +6,28 @@ using System.Threading.Tasks;
 
 namespace Selenium
 {
-    public class OneClickRegistrationResponce
+    public class EmailRegistationResponce
+    {
+        public EmailRegistrationOriginal Original { get; set; }
+    }
+
+    public class EmailRegistrationOriginal
     {
         public string Token { get; set; }
+    }
 
-        public string Login { get; set; }
+    public class RandomEmailResponce
+    {
+        public string Email { get; set; }
+    }
+
+    public class LoginResponce
+    {
+        public string Email { get; set; }
 
         public string Password { get; set; }
     }
-
+    
     public class SpinResponce
     {
         public float Bonus { get; set; }

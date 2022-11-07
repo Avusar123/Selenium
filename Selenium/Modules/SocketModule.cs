@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OpenQA.Selenium.DevTools.V104.Page;
 using SocketIOClient;
 using System;
 using System.Collections.Generic;
@@ -26,22 +25,17 @@ namespace Selenium.Modules
 
         public event AsyncEventHandler<string> GameStateChaged;
 
-        private IAccountGenerationModule accountmodule;
-
         private ILogger<SocketModule> logger;
 
         private const string CrashUrl = "wss://crash.getx.pro";
 
-        public SocketModule(IAccountGenerationModule accountmodule, ILogger<SocketModule> logger)
+        public SocketModule(ILogger<SocketModule> logger)
         {
-            this.accountmodule = accountmodule;
             this.logger = logger;
         }
 
-        public async Task Connect()
+        public async Task Connect(string token)
         {
-            var token = await accountmodule.GetOneTimeToken();
-
             WebSocket = new SocketIO(CrashUrl, new SocketIOOptions()
             {
                 AutoUpgrade = true,
@@ -55,12 +49,11 @@ namespace Selenium.Modules
             WebSocket.OnConnected += OnConnected;
             await WebSocket.ConnectAsync();
             AddHandlingEvent("crash.onCreated", CrashCreated);
-            AddHandlingEvent("crash.state", GameStateChaged);
         }
 
         private void OnConnected(object? sender, EventArgs e)
         {
-            logger.LogDebug("WebSocket connected");
+            logger.LogInformation("WebSocket connected");
             WebSocket.EmitAsync("crash.join");
         }
 
@@ -85,7 +78,7 @@ namespace Selenium.Modules
     public interface ISocketModule
     {
         public event AsyncEventHandler<string> GameStateChaged;
-        public Task Connect();
+        public Task Connect(string token);
 
         public event AsyncEventHandler<CrashGame> CrashCreated;
     }

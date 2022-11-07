@@ -6,16 +6,20 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Debug;
+using Selenium.Database;
 
 var builder = Host.CreateDefaultBuilder(args);
 
 builder.ConfigureServices(
     services =>
         services
-            .AddHostedService<BetBot>()
+            .AddSingleton<IBetPlacerModule, BetPlacerModule>()
             .AddScoped<IAPI, API>()
             .AddSingleton<ISocketModule, SocketModule>()
             .AddSingleton<IAccountGenerationModule, AccountGenerationModule>()
+            .AddScoped<IUsersRepo, UsersRepo>()
+            .AddDbContext<AccountContext>(contextLifetime: ServiceLifetime.Scoped, optionsLifetime: ServiceLifetime.Scoped)
+            .AddHostedService<UpdateHandler>()
 );
 
 builder.ConfigureLogging(loggerbuilder =>
