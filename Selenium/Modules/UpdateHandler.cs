@@ -2,11 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Selenium.Database;
 using Selenium.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Selenium.Modules
 {
@@ -26,7 +21,7 @@ namespace Selenium.Modules
 
         public async Task OnGameStarted(object? sender, CrashGame e)
         {
-            
+
             await betPlacerModule.PlaceBetForAllAccounts(e.gameId, (await usersRepo.GetAll(user => user.Balance >= 1 && user.Balance < user.NeededCash)).ToArray());
             await usersRepo.Save();
         }
@@ -67,7 +62,7 @@ namespace Selenium.Modules
                 {
                     Console.WriteLine(e);
                 }
-                
+
             }
         }
 
@@ -86,7 +81,7 @@ namespace Selenium.Modules
             var accounts = await usersRepo.GetAll();
             //await UpdateAccountsBalance(accounts.ToArray());
             socketModule.CrashCreated += OnGameStarted;
-            await socketModule.Connect(accounts[0].Token);
+            await socketModule.Connect(await accountGenerationModule.GetOneTimeToken());
             Task.Run(StartAccountCreation, stoppingToken);
         }
 

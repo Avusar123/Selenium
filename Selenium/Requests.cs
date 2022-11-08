@@ -1,11 +1,5 @@
-﻿using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Cryptography;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Selenium
 {
@@ -25,7 +19,7 @@ namespace Selenium
 
             serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 
-            var obj = new { email = Email, password = Password};
+            var obj = new { email = Email, password = Password };
 
             return JsonConvert.SerializeObject(obj, serializerSettings);
         }

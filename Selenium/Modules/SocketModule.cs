@@ -1,16 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SocketIOClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Websocket.Client;
-using Websocket.Client.Models;
 using static Selenium.Modules.SocketModule;
 
 namespace Selenium.Modules

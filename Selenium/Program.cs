@@ -1,12 +1,9 @@
-﻿using Selenium;
-using Selenium.Modules;
-using SocketIOClient;
-using System.Net.Http.Headers;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Debug;
+using Selenium;
 using Selenium.Database;
+using Selenium.Modules;
 
 var builder = Host.CreateDefaultBuilder(args);
 

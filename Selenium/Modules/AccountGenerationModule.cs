@@ -1,13 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Selenium.Database;
-using Selenium.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Selenium.Exceptions;
 
 namespace Selenium.Modules
 {
@@ -19,7 +10,7 @@ namespace Selenium.Modules
 
         public async Task<UserData> GenerateAccount(float autostop, int betmultiplier)
         {
-            var password = Guid.NewGuid().ToString("N").ToLower().Substring(0, 10);
+            var password = GeneratePassword();
 
             var email = await api.GetRandomMail(new RandomEmailRequest());
 
@@ -27,13 +18,40 @@ namespace Selenium.Modules
             {
                 throw new TooLongEmailException(email.Email);
             }
-            
-            var emailresponce = await api.EmailRegistration(new EmailRegistrationRequest() { Email = email.Email, Password = password });
 
-            var userdata = new UserData() { Login = email.Email, Password = password, 
-                Token = emailresponce.Token, BetMultiplier = betmultiplier, NeededCash = NeededCash, AutoStopRatio = autostop, Balance = 0 };
+            return await RegisterAccount(email.Email, password, autostop, betmultiplier);
+        }
+
+        private string GeneratePassword()
+        {
+            return Guid.NewGuid().ToString("N").ToLower().Substring(0, 10);
+        }
+
+        private async Task<UserData> RegisterAccount(string email, string password, float autostop, int betmultiplier)
+        {
+            var emailresponce = await api.EmailRegistration(new EmailRegistrationRequest() { Email = email, Password = password });
+
+            var userdata = new UserData()
+            {
+                Login = email,
+                Password = password,
+                Token = emailresponce.Token,
+                BetMultiplier = betmultiplier,
+                NeededCash = NeededCash,
+                AutoStopRatio = autostop,
+                Balance = 0
+            };
 
             return userdata;
+        }
+
+        public async Task<string> GetOneTimeToken()
+        {
+            var password = GeneratePassword();
+
+            var userdata = await RegisterAccount(password + "@mail.ru", password, 0, 0);
+
+            return userdata.Token;
         }
 
         public AccountGenerationModule(IAPI api)
@@ -46,5 +64,7 @@ namespace Selenium.Modules
     {
 
         public Task<UserData> GenerateAccount(float autostop, int betmultiplier);
+
+        public Task<string> GetOneTimeToken();
     }
 }

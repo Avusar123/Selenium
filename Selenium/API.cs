@@ -1,7 +1,7 @@
 ﻿using HtmlAgilityPack;
-using System.Text;
-using System.Net.Http.Headers;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace Selenium
 {
@@ -112,7 +112,7 @@ namespace Selenium
 
             var email = nickname.ToLower().Replace(" ", "") + random.Next(DateTime.Now.Year - 70, DateTime.Now.Year - 18) + "@gmail.com";
 
-            return new RandomEmailResponce() { Email = email};
+            return new RandomEmailResponce() { Email = email };
         }
     }
 
@@ -135,5 +135,5 @@ namespace Selenium
         public Task<LoginResponce> Login(LoginRequest request);
     }
 
-    
+
 }
