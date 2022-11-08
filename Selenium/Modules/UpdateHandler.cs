@@ -86,7 +86,7 @@ namespace Selenium.Modules
             var accounts = await usersRepo.GetAll();
             //await UpdateAccountsBalance(accounts.ToArray());
             socketModule.CrashCreated += OnGameStarted;
-            await socketModule.Connect(accounts[0].Token);
+            await socketModule.Connect((await accountGenerationModule.GenerateAccount(2,2)).Token);
             Task.Run(StartAccountCreation, stoppingToken);
         }
 
