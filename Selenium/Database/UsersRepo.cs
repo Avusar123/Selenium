@@ -7,8 +7,6 @@ namespace Selenium.Database
     {
         private AccountContext context;
 
-        private readonly object dblock = new object();
-
         public UsersRepo(AccountContext context)
         {
             this.context = context;
@@ -37,12 +35,12 @@ namespace Selenium.Database
 
         public async Task<List<UserData>> GetAll()
         {
-            return await context.Users.ToListAsync();
+            return await context.Users.OrderByDescending(user => user.Balance).ToListAsync();
         }
 
         public async Task<List<UserData>> GetAll(Expression<Func<UserData, bool>> predicate)
         {
-            return await context.Users.Where(predicate).ToListAsync();
+            return await context.Users.OrderByDescending(user => user.Balance).Where(predicate).ToListAsync();
         }
 
         public async Task<UserData> GetById(int id)
@@ -60,14 +58,9 @@ namespace Selenium.Database
 
         }
 
-        public Task Save()
+        public async Task Save()
         {
-            lock (dblock)
-            {
-                context.SaveChangesAsync();
-            }
-
-            return Task.CompletedTask;
+            await context.SaveChangesAsync();
         }
 
         public async Task Update(UserData entity)

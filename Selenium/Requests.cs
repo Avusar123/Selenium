@@ -25,6 +25,28 @@ namespace Selenium
         }
     }
 
+    public class ChangeNickNameRequest : RequestParamsBase
+    {
+        public override string Link => "https://api.getx.bingo/profile/change-nickname";
+
+        public override HttpMethod Method => HttpMethod.Post;
+
+        public string Name { get; set; }
+
+        public string Token { get; set; }
+
+        public override string GetBody()
+        {
+            var serializerSettings = new JsonSerializerSettings();
+
+            serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
+            var obj = new { nickname = Name };
+
+            return JsonConvert.SerializeObject(obj, serializerSettings);
+        }
+    }
+
     public class RandomEmailRequest : RequestParamsBase
     {
         public override string Link => "https://generatefakename.com/ru/email";
@@ -128,5 +150,15 @@ namespace Selenium
         public override HttpMethod Method => HttpMethod.Get;
 
         public override string XPathSelector => "//*[@id=\"result_tiles\"]/div/div/div/span";
+    }
+
+    public class RandomNameParseRequest : ParseRequest
+    {
+        public override string Link => "https://randomus.ru/name?type=1&sex=10&count=1";
+
+        public override HttpMethod Method => HttpMethod.Get;
+
+        public override string XPathSelector => "//*[@id=\"result_tiles\"]/div/div/div/span";
+
     }
 }

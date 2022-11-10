@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  selenium:
+    image: ${DOCKER_REGISTRY-}selenium
+    build:
+      context: .
+      dockerfile: Selenium/Dockerfile

@@ -17,7 +17,7 @@ namespace Selenium.Modules
             this.logger = logger;
         }
 
-        public async Task PlaceBetForAllAccounts(int roundId, params UserData[] accounts)
+        public async Task PlaceBetForAllAccounts(int roundId, CancellationToken token ,params UserData[] accounts)
         {
             foreach (var account in accounts)
             {
@@ -26,6 +26,8 @@ namespace Selenium.Modules
                     await new PlaceGeneratedAccountBetLogic(account.BetMultiplier, roundId,
                     new CheckAccountBalanceLogic(account.NeededCash,
                         new UpdateBalanceAccountLogic())).Handler(new PlaceBetLogicParams() { BetApi = api, Account = account, Logger = logger });
+
+                    token.ThrowIfCancellationRequested();
                 }
                 catch (NotEnoughBalanceException)
                 {
@@ -41,6 +43,6 @@ namespace Selenium.Modules
 
     public interface IBetPlacerModule
     {
-        public Task PlaceBetForAllAccounts(int roundId, params UserData[] accounts);
+        public Task PlaceBetForAllAccounts(int roundId, CancellationToken token, params UserData[] accounts);
     }
 }

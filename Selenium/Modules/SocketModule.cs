@@ -38,6 +38,7 @@ namespace Selenium.Modules
             WebSocket.OnConnected += OnConnected;
             await WebSocket.ConnectAsync();
             AddHandlingEvent("crash.onCreated", CrashCreated);
+            AddHandlingEvent("crash.state", GameStateChaged);
         }
 
         private void OnConnected(object? sender, EventArgs e)

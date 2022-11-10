@@ -102,17 +102,34 @@ namespace Selenium
             return await SendRequest<LoginResponce>(request, auth);
         }
 
-        public async Task<RandomEmailResponce> GetRandomMail(RandomEmailRequest request)
+        public async Task<RandomEmailResponce> GetRandomMail(RandomEmailParseRequest request)
         {
             var random = new Random();
 
-            var nodecollection = await ParseHtml(new RandomEmailParseRequest());
+            var nodecollection = await ParseHtml(request);
 
             var nickname = nodecollection[0].FirstChild.InnerHtml;
 
             var email = nickname.ToLower().Replace(" ", "") + random.Next(DateTime.Now.Year - 70, DateTime.Now.Year - 18) + "@gmail.com";
 
             return new RandomEmailResponce() { Email = email };
+        }
+
+        public async Task<RandomNameResponce> GetRandomName(RandomNameParseRequest request)
+        {
+
+            var nodecollection = await ParseHtml(request);
+
+            var nickname = nodecollection[0].FirstChild.InnerHtml;
+
+            return new RandomNameResponce() { Name = nickname };
+        }
+
+        public async Task<ChangeNickNameResponce> ChangeNickName(ChangeNickNameRequest request)
+        {
+            var auth = new AuthenticationHeaderValue("Bearer", request.Token);
+
+            return await SendRequest<ChangeNickNameResponce>(request, auth);
         }
     }
 
@@ -122,7 +139,9 @@ namespace Selenium
     {
         public Task<EmailRegistrationOriginal> EmailRegistration(EmailRegistrationRequest request);
 
-        public Task<RandomEmailResponce> GetRandomMail(RandomEmailRequest request);
+        public Task<RandomEmailResponce> GetRandomMail(RandomEmailParseRequest request);
+
+        public Task<RandomNameResponce> GetRandomName(RandomNameParseRequest request);
 
         public Task<SpinResponce> StartFreeSpin(SpinRequest request);
 
@@ -133,6 +152,8 @@ namespace Selenium
         public Task<PlaceBetResponce> PlaceBet(PlaceBetRequest request);
 
         public Task<LoginResponce> Login(LoginRequest request);
+
+        public Task<ChangeNickNameResponce> ChangeNickName(ChangeNickNameRequest request);
     }
 
 

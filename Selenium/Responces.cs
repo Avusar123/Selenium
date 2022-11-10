@@ -15,6 +15,16 @@
         public string Email { get; set; }
     }
 
+    public class ChangeNickNameResponce
+    {
+
+    }
+
+    public class RandomNameResponce
+    {
+        public string Name { get; set; }
+    }
+
     public class LoginResponce
     {
         public string Email { get; set; }

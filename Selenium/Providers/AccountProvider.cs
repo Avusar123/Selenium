@@ -1,25 +1,27 @@
-﻿using Selenium.Exceptions;
+﻿using Microsoft.Extensions.Configuration;
+using Selenium.Exceptions;
 
-namespace Selenium.Modules
+namespace Selenium.Providers
 {
-    public class AccountGenerationModule : IAccountGenerationModule
+    public class AccountProvider : IAccountGenerationModule
     {
         private IAPI api;
 
-        const int NeededCash = 15;
-
-        public async Task<UserData> GenerateAccount(float autostop, int betmultiplier)
+        public async Task<UserData> GenerateAccount(float autostop, int betmultiplier, int neededCash)
         {
             var password = GeneratePassword();
 
-            var email = await api.GetRandomMail(new RandomEmailRequest());
+            var email = await api.GetRandomMail(new RandomEmailParseRequest());
+
+            var name = await api.GetRandomName(new RandomNameParseRequest());
+
 
             if (email.Email.Length > 30)
             {
                 throw new TooLongEmailException(email.Email);
             }
 
-            return await RegisterAccount(email.Email, password, autostop, betmultiplier);
+            return await RegisterAccount(email.Email, password, autostop, betmultiplier, neededCash, name.Name);
         }
 
         private string GeneratePassword()
@@ -27,9 +29,14 @@ namespace Selenium.Modules
             return Guid.NewGuid().ToString("N").ToLower().Substring(0, 10);
         }
 
-        private async Task<UserData> RegisterAccount(string email, string password, float autostop, int betmultiplier)
+        private async Task<UserData> RegisterAccount(string email, string password, float autostop, int betmultiplier, int neededCash, string name = null)
         {
             var emailresponce = await api.EmailRegistration(new EmailRegistrationRequest() { Email = email, Password = password });
+
+            if (name != null)
+            {
+                await api.ChangeNickName(new ChangeNickNameRequest() { Token = emailresponce.Token, Name = name });
+            }
 
             var userdata = new UserData()
             {
@@ -37,8 +44,8 @@ namespace Selenium.Modules
                 Password = password,
                 Token = emailresponce.Token,
                 BetMultiplier = betmultiplier,
-                NeededCash = NeededCash,
                 AutoStopRatio = autostop,
+                NeededCash = neededCash,
                 Balance = 0
             };
 
@@ -49,12 +56,12 @@ namespace Selenium.Modules
         {
             var password = GeneratePassword();
 
-            var userdata = await RegisterAccount(password + "@mail.ru", password, 0, 0);
+            var userdata = await RegisterAccount(password + "@mail.ru", password, 0, 0, 0);
 
             return userdata.Token;
         }
 
-        public AccountGenerationModule(IAPI api)
+        public AccountProvider(IAPI api, IConfiguration configuration)
         {
             this.api = api;
         }
@@ -63,7 +70,7 @@ namespace Selenium.Modules
     public interface IAccountGenerationModule
     {
 
-        public Task<UserData> GenerateAccount(float autostop, int betmultiplier);
+        public Task<UserData> GenerateAccount(float autostop, int betmultiplier, int neededCash);
 
         public Task<string> GetOneTimeToken();
     }
