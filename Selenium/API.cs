@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using Newtonsoft.Json;
+using Selenium.Exceptions;
 using System.Net.Http.Headers;
 using System.Text;
 
@@ -50,12 +51,19 @@ namespace Selenium
         private async Task<Responce> SendRequest<Responce>(RequestParamsBase parms, AuthenticationHeaderValue auth = null)
             where Responce : class
         {
-
-            var responce = await client.SendAsync(CompileRequestMessage(parms, auth));
+            var message = CompileRequestMessage(parms, auth);
+            var responce = await client.SendAsync(message);
 
             var responcejson = await responce.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<Responce>(responcejson);
+            var obj = JsonConvert.DeserializeObject<Responce>(responcejson);
+
+            if (obj == null || obj.GetType().GetProperties().Where(p => p.GetValue(obj) == null).Count() > 0)
+            {
+                throw new APIException(responcejson);
+            }
+
+            return obj;
         }
 
         private StringContent FormRequestBody(RequestParamsBase parms)
@@ -112,7 +120,7 @@ namespace Selenium
 
             var email = nickname.ToLower().Replace(" ", "") + random.Next(DateTime.Now.Year - 70, DateTime.Now.Year - 18) + "@gmail.com";
 
-            return new RandomEmailResponce() { Email = email };
+            return new RandomEmailResponce() { Email = email ?? throw new RandomApiException() };
         }
 
         public async Task<RandomNameResponce> GetRandomName(RandomNameParseRequest request)
@@ -122,7 +130,9 @@ namespace Selenium
 
             var nickname = nodecollection[0].FirstChild.InnerHtml;
 
-            return new RandomNameResponce() { Name = nickname };
+
+
+            return new RandomNameResponce() { Name = nickname ?? throw new RandomApiException() };
         }
 
         public async Task<ChangeNickNameResponce> ChangeNickName(ChangeNickNameRequest request)
@@ -131,6 +141,11 @@ namespace Selenium
 
             return await SendRequest<ChangeNickNameResponce>(request, auth);
         }
+
+        public async Task<CaptchaResponce> GetCaptchaResponce(RecaptchaRequest request)
+        {
+            return await SendRequest<CaptchaResponce>(request);
+        }
     }
 
 
@@ -138,6 +153,8 @@ namespace Selenium
     public interface IAPI
     {
         public Task<EmailRegistrationOriginal> EmailRegistration(EmailRegistrationRequest request);
+
+        public Task<CaptchaResponce> GetCaptchaResponce(RecaptchaRequest request);
 
         public Task<RandomEmailResponce> GetRandomMail(RandomEmailParseRequest request);
 

@@ -3,7 +3,7 @@
   <PropertyGroup Label="Globals">
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
-    <ProjectGuid>2059c773-2ea3-4c9c-835f-90660d798bdc</ProjectGuid>
+    <ProjectGuid>b8ad649f-6bb9-4fc5-ae54-90d9308d22fa</ProjectGuid>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">
@@ -11,8 +11,5 @@
     </None>
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="Selenium\Selenium.csproj" />
   </ItemGroup>
 </Project>

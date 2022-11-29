@@ -10,11 +10,19 @@ namespace Selenium.Providers
         public async Task<UserData> GenerateAccount(float autostop, int betmultiplier, int neededCash)
         {
             var password = GeneratePassword();
+            RandomEmailResponce email;
+            RandomNameResponce name;
+            try
+            {
+                email = await api.GetRandomMail(new RandomEmailParseRequest());
 
-            var email = await api.GetRandomMail(new RandomEmailParseRequest());
+                name = await api.GetRandomName(new RandomNameParseRequest());
+            } catch (NullReferenceException)
+            {
+                throw new RandomApiException();
+            }
 
-            var name = await api.GetRandomName(new RandomNameParseRequest());
-
+            
 
             if (email.Email.Length > 30)
             {
@@ -31,7 +39,9 @@ namespace Selenium.Providers
 
         private async Task<UserData> RegisterAccount(string email, string password, float autostop, int betmultiplier, int neededCash, string name = null)
         {
-            var emailresponce = await api.EmailRegistration(new EmailRegistrationRequest() { Email = email, Password = password });
+            var responce = await api.GetCaptchaResponce(new());
+
+            var emailresponce = await api.EmailRegistration(new EmailRegistrationRequest() { Email = email, Password = password, CaptchaResponce = responce.Captcha });
 
             if (name != null)
             {

@@ -11,6 +11,8 @@ namespace Selenium
 
         public string Email { get; set; }
 
+        public string CaptchaResponce { get; set; }
+
         public string Password { get; set; }
 
         public override string GetBody()
@@ -19,7 +21,7 @@ namespace Selenium
 
             serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 
-            var obj = new { email = Email, password = Password };
+            var obj = new Dictionary<string, string>() { {"email", Email}, { "password", Password }, { "g-recaptcha-response", CaptchaResponce } };
 
             return JsonConvert.SerializeObject(obj, serializerSettings);
         }
@@ -97,9 +99,9 @@ namespace Selenium
     {
         public override string Link => "https://api.getx.bingo/games/crash/history";
 
+
         public override HttpMethod Method => HttpMethod.Get;
     }
-
     public class PlaceBetRequest : RequestParamsBase
     {
         public override string Link => "https://api.getx.bingo/crash/placeBet";
@@ -124,6 +126,13 @@ namespace Selenium
 
             return JsonConvert.SerializeObject(obj, serializerSettings);
         }
+    }
+
+    public class RecaptchaRequest : RequestParamsBase
+    {
+        public override string Link => "http://recaptcha:8000/captcha";
+
+        public override HttpMethod Method => HttpMethod.Get;
     }
 
     public abstract class RequestParamsBase

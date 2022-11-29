@@ -41,14 +41,28 @@ namespace Selenium.HostedClasses
                     var account = await accountGenerationModule.GenerateAccount(autostop, betmultiplier, neededCash);
 
                     await _usersRepo.Create(account);
+
+                    Console.WriteLine("Account Created");
                 }
                 catch (TooLongEmailException)
                 {
                     continue;
                 }
+                catch (RandomApiException)
+                {
+                    continue;
+                }
+                catch (APIException e)
+                {
+                    Console.WriteLine(e.Message);
+                }
                 //catch (NullReferenceException e)
                 //{
-                //    Console.WriteLine(e);
+                //    Console.WriteLine(e.StackTrace);
+                //}
+                //catch (Exception e)
+                //{
+                //    Console.WriteLine(e.StackTrace);
                 //}
             }
         }

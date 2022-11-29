@@ -27,7 +27,10 @@ namespace Selenium.Modules
                     new CheckAccountBalanceLogic(account.NeededCash,
                         new UpdateBalanceAccountLogic())).Handler(new PlaceBetLogicParams() { BetApi = api, Account = account, Logger = logger });
 
-                    token.ThrowIfCancellationRequested();
+                    if (token.IsCancellationRequested)
+                    {
+                        return;
+                    }
                 }
                 catch (NotEnoughBalanceException)
                 {

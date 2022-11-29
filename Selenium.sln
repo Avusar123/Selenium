@@ -10,7 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Selenium.Tests", "Selenium.Tests\Selenium.Tests.csproj", "{8692FDB9-20D2-47F5-8139-9063EB737459}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Selenium.Tests", "Selenium.Tests\Selenium.Tests.csproj", "{8692FDB9-20D2-47F5-8139-9063EB737459}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{B8AD649F-6BB9-4FC5-AE54-90D9308D22FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +28,10 @@ Global
 		{8692FDB9-20D2-47F5-8139-9063EB737459}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8692FDB9-20D2-47F5-8139-9063EB737459}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8692FDB9-20D2-47F5-8139-9063EB737459}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8AD649F-6BB9-4FC5-AE54-90D9308D22FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8AD649F-6BB9-4FC5-AE54-90D9308D22FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8AD649F-6BB9-4FC5-AE54-90D9308D22FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8AD649F-6BB9-4FC5-AE54-90D9308D22FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

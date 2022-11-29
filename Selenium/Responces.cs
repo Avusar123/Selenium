@@ -2,6 +2,7 @@
 {
     public class EmailRegistationResponce
     {
+
         public EmailRegistrationOriginal Original { get; set; }
     }
 
@@ -23,6 +24,11 @@
     public class RandomNameResponce
     {
         public string Name { get; set; }
+    }
+
+    public class CaptchaResponce
+    {
+        public string Captcha { get; set; }
     }
 
     public class LoginResponce

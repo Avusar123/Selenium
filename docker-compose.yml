@@ -1,8 +1,34 @@
 version: '3.4'
 
 services:
-  selenium:
-    image: ${DOCKER_REGISTRY-}selenium
-    build:
-      context: .
-      dockerfile: Selenium/Dockerfile
+    selenium:
+        image: ${DOCKER_REGISTRY-}selenium
+        build:
+            context: .
+            dockerfile: Selenium/Dockerfile
+        depends_on:
+            - postgresserver
+            - recaptcha
+    postgresserver:
+        image: postgres
+        restart: always
+        environment:
+            POSTGRES_PASSWORD: Nitroxwar123
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+        ports:
+            - 5432:5432
+    recaptcha:
+        image: avusar/recaptcha:latest
+        restart: always
+        ports:
+            - 8000:8000
+        environment:
+            - RECAPTCHALINK=https://www.recaptcha.net/recaptcha/api2/anchor?ar=1&k=6LfdCy8hAAAAAFZFU8edjfLRCKI6g5tki0CSitCW&co=aHR0cHM6Ly9nZXR4LmJpbmdvOjQ0Mw..&hl=ru&v=Km9gKuG06He-isPsP6saG8cn&size=invisible&cb=3bwyq86cobxf
+    
+
+volumes:
+  pgdata:
+
+volumes:
+  pgdata:

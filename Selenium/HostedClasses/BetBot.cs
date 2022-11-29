@@ -33,6 +33,7 @@ namespace Selenium.HostedClasses
         private async Task PlaceBetsAsync()
         {
             var accounts = await usersRepo.GetAll(user => user.Balance >= 1 && user.Balance < user.NeededCash);
+            logger.LogDebug($"Available accounts: {accounts.Count}");
             await betPlacerModule.PlaceBetForAllAccounts(crashGame.gameId, BetTimeExpiredCancellation.Token, accounts.ToArray());
             await usersRepo.Save();
         }
